@@ -1,19 +1,16 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-# 모델 로딩
-model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+model_id = "meta-llama/Llama-2-7b-chat-hf"
 
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+tokenizer = AutoTokenizer.from_pretrained(model_id, use_auth_token=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
     device_map="auto",
     torch_dtype="auto"
 )
 
-# 파이프라인 생성
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# 입력 정보
 info = {
     "업종": "카페",
     "위치": "바다 전망이 보이는 해안가",
@@ -24,7 +21,6 @@ info = {
     "추가정보": "점심에 방문, 예약 없이 이용, 대기 시간 없이 바로 입장, 여행 중, 친구와 방문"
 }
 
-# 프롬프트
 prompt = f"""
 다음 음식점 정보를 참고해서 감성적이고 사람들이 공감할 수 있는 트렌디한 **한국어 해시태그**를 5개 만들어줘.
 단순 키워드보다 감정, 분위기, 감성을 담아줘.
@@ -53,4 +49,6 @@ output = pipe(
     temperature=0.7,
     top_p=0.9
 )
-print("🎯 생성된 해시태그:\n", output[0]['generated_text'].replace(prompt, '').strip())
+
+result = output[0]['generated_text'].replace(prompt, '').strip()
+print("🎯 생성된 해시태그:\n", result)
